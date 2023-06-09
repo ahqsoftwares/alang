@@ -67,7 +67,8 @@ await app.rest.repos.uploadReleaseAsset({
     label: `${process.env.filename}${process.env.os == "windows-latest" ? ".exe" : `.bin.${Math.random()}`}`,
     data: readFileSync("./Cargo.toml"),
     headers: {
-      'X-GitHub-Api-Version': '2022-11-28'
+      'X-GitHub-Api-Version': '2022-11-28',
+      "Contect-Type": "application/octet-stream"
     }
 });
 
