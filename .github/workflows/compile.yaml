@@ -10,10 +10,10 @@ on:
 jobs:
   build_and_test:
     strategy:
+      max-parallel: 1
       fail-fast: true
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        module: [".", cli, compiler, interpreter, packager, packloader]
+        os: [windows-latest, macos-latest, ubuntu-latest]
 
     runs-on: ${{ matrix.os }}
 
@@ -27,9 +27,28 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Build Lang Modules
-        run: cargo build
-        working-directory: ${{ matrix.module }}
+      - name: Build Lang
+        run: cargo build --release
+
+      - name: Build Cli
+        run: cargo build --release
+        working-directory: cli
+
+      - name: Build Compiler
+        run: cargo build --release
+        working-directory: compiler
+
+      - name: Build Interpreter
+        run: cargo build --release
+        working-directory: interpreter
+
+      - name: Build Packager
+        run: cargo build --release
+        working-directory: packager
+
+      - name: Build Packloader
+        run: cargo build --release
+        working-directory: packloader
 
       - name: Install Packages
         run: npm install .
@@ -40,7 +59,6 @@ jobs:
         working-directory: .
         env:
           os: ${{ matrix.os }}
-          filename: ${{ matrix.module }}
           ghtoken: ${{ secrets.GITHUB_TOKEN }}
 
       

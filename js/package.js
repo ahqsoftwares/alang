@@ -59,7 +59,7 @@ console.log(`
 ╚██████╔╝██║░░░░░███████╗╚█████╔╝██║░░██║██████╔╝██║██║░╚███║╚██████╔╝
 ░╚═════╝░╚═╝░░░░░╚══════╝░╚════╝░╚═╝░░╚═╝╚═════╝░╚═╝╚═╝░░╚══╝░╚═════╝░`);
 
-const file = readFileSync("./Cargo.toml");
+/*const file = readFileSync("./Cargo.toml");
 
 await app.rest.repos.uploadReleaseAsset({
     owner: 'ahqsoftwares',
@@ -71,7 +71,7 @@ await app.rest.repos.uploadReleaseAsset({
       'X-GitHub-Api-Version': '2022-11-28',
       'content-type': "application/octet-stream",
     }
-});
+});*/
 
 }catch(e){err(e)}})()
 
