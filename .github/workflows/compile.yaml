@@ -1,7 +1,9 @@
 name: AHQ Lang Packager
 
 on:
-  push
+  push:
+    branches:
+      - master
 
 jobs:
   build:
