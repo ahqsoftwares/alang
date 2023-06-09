@@ -40,12 +40,11 @@ if (release == false) {
         owner: 'ahqsoftwares',
         repo: 'alang',
         tag_name: version,
-        target_commitish: 'master',
         name: `Alang ${version}`,
         body: String(readFileSync("./latest.md")),
         draft: true,
         prerelease: false,
-        generate_release_notes: false,
+        generate_release_notes: true,
         headers: {
             'X-GitHub-Api-Version': '2022-11-28'
         }
@@ -60,14 +59,17 @@ console.log(`
 ╚██████╔╝██║░░░░░███████╗╚█████╔╝██║░░██║██████╔╝██║██║░╚███║╚██████╔╝
 ░╚═════╝░╚═╝░░░░░╚══════╝░╚════╝░╚═╝░░╚═╝╚═════╝░╚═╝╚═╝░░╚══╝░╚═════╝░`);
 
+const file = readFileSync("./Cargo.toml");
+
 await app.rest.repos.uploadReleaseAsset({
     owner: 'ahqsoftwares',
     repo: 'alang',
     release_id: release.id,
     label: `${process.env.filename}${process.env.os == "windows-latest" ? ".exe" : `.bin.${Math.random()}`}`,
-    data: readFileSync("./Cargo.toml"),
+    data: file,
     headers: {
-      'X-GitHub-Api-Version': '2022-11-28'
+      'X-GitHub-Api-Version': '2022-11-28',
+      'content-type': "application/octet-stream",
     }
 });
 
