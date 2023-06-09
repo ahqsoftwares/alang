@@ -1,17 +1,18 @@
-name: AHQ Lang Packager
+name: ALang Builder
 
 on:
   push:
+    paths-ignore:
+      - 'docs/**'
     branches:
       - master
 
 jobs:
-  build:
+  test:
     strategy:
       fail-fast: true
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        rust: [stable, beta, nightly]
         module: [".", cli, compiler, interpreter, packager, packloader]
 
     runs-on: ${{ matrix.os }}
@@ -20,18 +21,30 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Setup Nodejs
+        uses: actions/setup-node@v3
+        with:
+          cache: npm
+
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: ${{ matrix.rust }}
-      
-      - name: Build Cli
-        run: cargo build --release
-        working-directory: cli
 
-      - name: Build Module
-        run: cargo build --release
+      - name: Build Lang Modules
+        run: cargo build
         working-directory: ${{ matrix.module }}
+
+      - name: Install Packages
+        run: npm install .
+        working-directory: js
+
+      - name: Upload for release
+        run: node js/package.js
+        working-directory: .
+        env:
+          os: ${{ matrix.os }}
+          filename: ${{ matrix.module }}
+          ghtoken: ${{ secrets.GITHUB_TOKEN }}
+
       
 
       
