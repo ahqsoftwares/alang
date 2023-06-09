@@ -42,7 +42,7 @@ if (release == false) {
         tag_name: version,
         target_commitish: 'master',
         name: `Alang ${version}`,
-        body: readFileSync("./latest.md"),
+        body: String(readFileSync("./latest.md")),
         draft: true,
         prerelease: false,
         generate_release_notes: false,
@@ -67,8 +67,7 @@ await app.rest.repos.uploadReleaseAsset({
     label: `${process.env.filename}${process.env.os == "windows-latest" ? ".exe" : `.bin.${Math.random()}`}`,
     data: readFileSync("./Cargo.toml"),
     headers: {
-      'X-GitHub-Api-Version': '2022-11-28',
-      "Contect-Type": "application/octet-stream"
+      'X-GitHub-Api-Version': '2022-11-28'
     }
 });
 
