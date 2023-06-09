@@ -1,0 +1,9 @@
+[package]
+name = "alang-compiler"
+version = "0.1.0"
+edition = "2021"
+description = "Convert the alang code into ahq-asm"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]

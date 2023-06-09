@@ -1,0 +1,12 @@
+.packages [
+    
+]
+
+.modules [
+    "subscript"
+]
+
+.config {
+    @pubdir /target
+    @package ["win32", "linux", "macos"]
+}
