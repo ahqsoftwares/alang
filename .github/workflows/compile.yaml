@@ -1,0 +1,35 @@
+name: AHQ Lang Packager
+
+on:
+  push
+
+jobs:
+  build:
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        rust: [stable, beta, nightly]
+        module: [".", cli, compiler, interpreter, packager, packloader]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ matrix.rust }}
+      
+      - name: Build Cli
+        run: cargo build --release
+        working-directory: cli
+
+      - name: Build Module
+        run: cargo build --release
+        working-directory: ${{ matrix.module }}
+      
+
+      
