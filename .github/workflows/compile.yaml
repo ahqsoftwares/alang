@@ -54,6 +54,8 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
+    name: Build & Test (${{ matrix.os }})
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -86,6 +88,17 @@ jobs:
       - name: Build Packloader
         run: cargo build --release
         working-directory: packloader
+      
+      - name: Zip Everything
+        uses: montudor/action-zip@v1
+        with:
+          args: zip -qq -r code.zip .
+      
+      - name: Upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.os }}.zip
+          path: code.zip
 
       
 
