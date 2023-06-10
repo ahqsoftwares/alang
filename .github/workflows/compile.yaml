@@ -107,7 +107,7 @@ jobs:
               name
             } = await require("./js/zip.js");
 
-            return {installer, tools, toolsName: name.tools, installerName: name.installer}
+            return JSON.stringify({installer, tools, toolsName: name.tools, installerName: name.installer})
 
       - name: Archive Release
         uses: thedoctor0/zip-release@0.7.1
@@ -125,19 +125,24 @@ jobs:
       - name: Upload 
         uses: actions/github-script@v6
         env:
-          toolsPath: ${{ steps.assets.outputs.result.tools }}
-          installerPath: ${{ steps.assets.outputs.result.installer }}
-          toolsName: ${{ steps.assets.outputs.result.toolsName }}
-          installerName: ${{ steps.assets.outputs.result.installerName }}
+          data: ${{ steps.assets.outputs.result }}
           uurl: ${{ needs.create_release.outputs.upload_url }}
         with:
           script: |
             console.log(process.env);
+
+            const {
+              tools,
+              installer,
+              toolsName,
+              installerName
+            } = JSON.parse(process.env.data);
+
             const fs = require("fs");
             const uploadUrl = process.env.uurl;
             const assetPaths = [
-              [process.env.toolsPath, process.env.toolsName, "application/zip"],
-              [process.env.installerPath, , process.env.installerName, "application/octet-stream"]
+              [tools, toolsName, "application/zip"],
+              [installer, , installerName, "application/octet-stream"]
             ];
     
             for (let i = 0; i < assetPaths.length; i++) {
