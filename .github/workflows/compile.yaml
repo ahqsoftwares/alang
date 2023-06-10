@@ -89,10 +89,12 @@ jobs:
         run: cargo build --release
         working-directory: packloader
       
-      - name: Zip Everything
-        uses: montudor/action-zip@v1
+      - name: Archive Release
+        uses: thedoctor0/zip-release@0.7.1
         with:
-          args: zip -qq -r code.zip .
+          type: 'zip'
+          filename: 'code.zip'
+          path: '.'
       
       - name: Upload
         uses: actions/upload-artifact@v3
