@@ -94,15 +94,12 @@ jobs:
         run: npm install .
         working-directory: js
 
-      - name: Get Assets
-        id: assets
-        uses: actions/github-script@v6
+      - name: Get & Push Assets
+        run: node js/zip.js
         env:
           OS: ${{ matrix.os }}
           releaseid: ${{ needs.create_release.outputs.release_id }}
-        with:
-          script: |
-            await require("./js/zip.js");
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Archive Release
         uses: thedoctor0/zip-release@0.7.1

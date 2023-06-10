@@ -77,10 +77,7 @@ module.exports = (async () => {
   const base = {
     owner: "ahqsoftwares",
     repo: "alang",
-    release_id: process.env.releaseid,
-    headers: {
-      Authorization: `Bearer ${process.env.GITHUB_TOKEN}`
-    }
+    release_id: process.env.releaseid
   };
 
   await github.rest.repos.uploadReleaseAsset({
@@ -88,7 +85,6 @@ module.exports = (async () => {
     name: data.name.tools,
     data: fs.readFileSync(data.tools),
     headers: {
-      Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
       "Content-Type": "application/zip",
     }
   });
@@ -98,7 +94,6 @@ module.exports = (async () => {
     name: data.name.installer,
     data: fs.readFileSync(data.installer),
     headers: {
-      Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
       "Content-Type": "application/octet-stream",
     }
   });
