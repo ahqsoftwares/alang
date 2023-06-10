@@ -107,7 +107,7 @@ jobs:
               name
             } = await require("./js/zip.js");
 
-            return {installer, tools, toolsName: name.tools, installerName: names.installer}
+            return {installer, tools, toolsName: name.tools, installerName: name.installer}
 
       - name: Upload 
         uses: actions/github-script@v6
