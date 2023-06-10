@@ -8,6 +8,43 @@ on:
       - master
 
 jobs:
+  create_release:
+    outputs:
+      release_id: ${{ steps.create-release.outputs.result }}
+    runs-on: ubuntu-latest
+
+    jobs:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+
+      - name: Install Packages
+        run: npm install .
+        working-directory: js
+
+      - name: create release
+        id: create-release
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const {
+              body,
+              version
+            } = await require("./js/index.js");
+
+            const { data } = await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: `lang-${version}`,
+              name: `Alang v${version}`,
+              body: ,
+              draft: true,
+              prerelease: false
+            })
+            return data.id
+
   build_and_test:
     strategy:
       max-parallel: 1
@@ -49,17 +86,6 @@ jobs:
       - name: Build Packloader
         run: cargo build --release
         working-directory: packloader
-
-      - name: Install Packages
-        run: npm install .
-        working-directory: js
-
-      - name: Upload for release
-        run: node js/package.js
-        working-directory: .
-        env:
-          os: ${{ matrix.os }}
-          ghtoken: ${{ secrets.GITHUB_TOKEN }}
 
       
 
