@@ -1,15 +1,13 @@
 const { readFileSync } = require("node:fs");
-const toml = require('toml');
+const toml = require("toml");
 
-const { package: { version } } = toml.parse(
-    readFileSync(
-    "./Cargo.toml"
-    ).toString()
-)
+const {
+  package: { version },
+} = toml.parse(readFileSync("./Cargo.toml").toString());
 
 const body = String(readFileSync("./latest.md"));
 
 module.exports = {
-    version,
-    body
-}
+  version,
+  body,
+};

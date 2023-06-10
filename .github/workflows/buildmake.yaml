@@ -99,6 +99,7 @@ jobs:
         uses: actions/github-script@v6
         env:
           OS: ${{ matrix.os }}
+          releaseid: ${{ needs.create_release.outputs.release_id }}
         with:
           script: |
             await require("./js/zip.js");
@@ -110,58 +111,11 @@ jobs:
           filename: 'debug.zip'
           path: '.'
       
-      - name: Upload
+      - name: Upload as Debug
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.os }}.zip
           path: debug.zip
-
-      - name: Upload 
-        uses: actions/github-script@v6
-        env:
-          OS: ${{ matrix.os }}
-          rid: ${{ needs.create_release.outputs.release_id }}
-        with:
-          script: |
-            const osEs = {
-              "ubuntu-latest": "linux",
-              "macos-latest": "macos",
-              "windows-latest": "windows"
-            };
-
-            const osName = osEs[process.env.OS.toLowerCase()];
-
-            const toolsName = `tools-${osName}.zip`;
-            const toolsPath = `./${toolsName}`;
-
-            const installerName = `alang_installer_${osName}${osName == "windows" ? ".exe" : ""}`;
-            const installerPath = `./${installerName}`;
-
-            const fs = require("fs");
-            const toUpload = [
-              [toolsPath, toolsName, "application/zip"],
-              [installerPath, installerName, "application/octet-stream"]
-            ];
-    
-            for (let i = 0; i < toUpload.length; i++) {
-              console.log(toUpload[i]);
-              const [assetPath, assetName, assetContentType] = toUpload[i];
-
-              const contentLength = filePath => fs.statSync(filePath).size;
-              const headers = { 'content-type': assetContentType, 'content-length': contentLength(assetPath) };
-
-              await github.request('POST /repos/{owner}/{repo}/releases/{release_id}/assets{?name,label}', {
-                owner: 'ahqsoftwares',
-                repo: 'alang',
-                release_id: process.env.rid,
-                name: assetName,
-                data: fs.readFileSync(assetPath),
-                headers: {
-                  ...headers
-                }
-              });
-              console.log(`✅ Uploaded ${assetName}`);
-            }
 
       
 

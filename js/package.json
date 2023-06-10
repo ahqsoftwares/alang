@@ -12,5 +12,8 @@
     "adm-zip": "^0.5.10",
     "octokit": "^2.0.19",
     "toml": "^3.0.0"
+  },
+  "devDependencies": {
+    "prettier": "^2.8.8"
   }
 }
