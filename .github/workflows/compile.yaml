@@ -97,6 +97,8 @@ jobs:
       - name: Get Assets
         id: assets
         uses: actions/github-script@v6
+        env:
+          OS: ${{ martix.os }}
         with:
           script: |
             const {

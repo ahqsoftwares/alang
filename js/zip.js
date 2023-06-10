@@ -7,7 +7,7 @@ const osEs = {
     "windows-latest": ["windows", "./target/release/alang.exe"]
 };
 
-const [osName, installer] = osEs[process.env.OS];
+const [osName, installer] = osEs[process.env.OS.toLowerCase()];
 
 const cli = "./cli/target/release";
 const compiler = "./cli/target/compiler";
