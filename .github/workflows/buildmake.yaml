@@ -154,6 +154,7 @@ jobs:
                 owner: 'ahqsoftwares',
                 repo: 'alang',
                 release_id: process.env.rid,
+                name: assetName,
                 data: fs.readFileSync(assetPath),
                 headers: {
                   ...headers
