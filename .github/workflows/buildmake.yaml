@@ -101,13 +101,7 @@ jobs:
           OS: ${{ matrix.os }}
         with:
           script: |
-            const {
-              installer,
-              tools,
-              name
-            } = await require("./js/zip.js");
-
-            return JSON.stringify({installer, tools, toolsName: name.tools, installerName: name.installer})
+            await require("./js/zip.js");
 
       - name: Archive Release
         uses: thedoctor0/zip-release@0.7.1
@@ -125,21 +119,33 @@ jobs:
       - name: Upload 
         uses: actions/github-script@v6
         env:
-          data: ${{ steps.assets.outputs.result }}
+          OS: ${{ matrix.os }}
           uurl: ${{ needs.create_release.outputs.upload_url }}
         with:
           script: |
-            const jsonParsed = JSON.parse(process.env.data);
+            const osEs = {
+              "ubuntu-latest": "linux",
+              "macos-latest": "macos",
+              "windows-latest": "windows"
+            };
+
+            const osName = osEs[process.env.OS.toLowerCase()];
+
+            const toolsName = `tools-${osName}.zip`;
+            const toolsPath = `./${toolsName}`;
+
+            const installerName = `alang_installer_${osName}${osName == "windows" ? ".exe" : ""}`;
+            const installerPath = `./${installerName}`;
 
             const fs = require("fs");
             const uploadUrl = process.env.uurl;
             const toUpload = [
-              [jsonParsed["tools"], jsonParsed["toolsName"], "application/zip"],
-              [jsonParsed["installer"], jsonParsed["installerName"], "application/octet-stream"]
+              [toolsPath, toolsName, "application/zip"],
+              [installerPath, installerName, "application/octet-stream"]
             ];
     
             for (let i = 0; i < toUpload.length; i++) {
-              console.log(toUpload[i], JSON.parse(process.env.data));
+              console.log(toUpload[i]);
               const [assetPath, assetName, assetContentType] = toUpload[i];
 
               const contentLength = filePath => fs.statSync(filePath).size;
