@@ -11,7 +11,7 @@ jobs:
   create_release:
     name: Make draft release
     outputs:
-      release_id: ${{ steps.create-release.outputs.result }}
+      upload_url: ${{ steps.create-release.outputs.result }}
     runs-on: ubuntu-latest
 
     steps:
@@ -44,7 +44,7 @@ jobs:
               draft: true,
               prerelease: false
             })
-            return data.id
+            return data["upload_url"]
 
   build_and_test:
     needs: create_release
@@ -103,22 +103,42 @@ jobs:
           script: |
             const {
               installer,
-              tools
+              tools,
+              name
             } = await require("./js/zip.js");
 
-            return {installer, tools}
+            return {installer, tools, toolsName: name.tools, installerName: names.installer}
 
-      - name: Upload Installer ${{ matrix.os }}
-        uses: ahqsoftwares/upload-assets@v10
+      - name: Upload 
+        uses: actions/github-script@v6
+        env:
+          toolsPath: ${{ steps.assets.outputs.result.tools }}
+          installerPath: ${{ steps.assets.outputs.result.installer }}
+          toolsName: ${{ steps.assets.outputs.result.toolsName }}
+          installerName: ${{ steps.assets.outputs.result.installerName }}
+          uurl: ${{ needs.create_release.outputs.upload_url }}
         with:
-          asset-path: ${{ steps.assets.outputs.result.installer }}
-          id: ${{ needs.create_release.outputs.release_id }}
+          script: |
+            const uploadUrl = process.env.uurl;
+            const assetPaths = [
+              [process.env.toolsPath, process.env.toolsName, "application/zip"],
+              [process.env.installerPath, , process.env.installerName, "application/octet-stream"]
+            ];
+    
+            for (let i = 0; i < assetPaths.length; i++) {
+              const [assetPath, assetName, assetContentType] = assetPaths[i];
 
-      - name: Upload Tools ${{ matrix.os }}
-        uses: ahqsoftwares/upload-assets@v11
-        with:
-          asset-path: ${{ steps.assets.outputs.result.tools }}
-          id: ${{ needs.create_release.outputs.release_id }}
+              const contentLength = filePath => fs.statSync(filePath).size;
+              const headers = { 'content-type': assetContentType, 'content-length': contentLength(assetPath) };
+
+              const uploadAssetResponse = await github.repos.uploadReleaseAsset({
+                url: uploadUrl,
+                headers,
+                name: assetName,
+                file: fs.readFileSync(assetPath)
+              }); 
+              console.log(`✅ Uploaded ${assetName}`);
+            }
 
       
 

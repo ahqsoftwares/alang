@@ -47,15 +47,21 @@ for (let i = 0; i < files.length; i++) {
     file.addLocalFile(files[i]);
 }
 
-const toolsPath = `./tools-${osName}.zip`
+const toolsName = `tools-${osName}.zip`;
+const toolsPath = `./${toolsName}`;
 
 file.writeZip(toolsPath);
 
-const installerPath = `./alang_installer_${osName}${osName == "windows" ? ".exe" : ""}`;
+const installerName = `alang_installer_${osName}${osName == "windows" ? ".exe" : ""}`;
+const installerPath = `./${installerName}`;
 
 fs.copyFileSync(installer, installerPath);
 
 module.exports = {
     installer: installerPath,
-    tools: toolsPath
+    tools: toolsPath,
+    name: {
+        tools: toolsName,
+        installer: installerName
+    }
 };
