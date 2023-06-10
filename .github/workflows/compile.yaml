@@ -13,7 +13,7 @@ jobs:
       release_id: ${{ steps.create-release.outputs.result }}
     runs-on: ubuntu-latest
 
-    jobs:
+    steps:
       - name: Checkout
         uses: actions/checkout@v3
 
@@ -46,6 +46,7 @@ jobs:
             return data.id
 
   build_and_test:
+    needs: [create_release]
     strategy:
       fail-fast: true
       matrix:
