@@ -109,6 +109,19 @@ jobs:
 
             return {installer, tools, toolsName: name.tools, installerName: name.installer}
 
+      - name: Archive Release
+        uses: thedoctor0/zip-release@0.7.1
+        with:
+          type: 'zip'
+          filename: 'debug.zip'
+          path: '.'
+      
+      - name: Upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.os }}.zip
+          path: debug.zip
+
       - name: Upload 
         uses: actions/github-script@v6
         env:
