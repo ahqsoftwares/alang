@@ -71,7 +71,7 @@ module.exports = (async () => {
   };
 
   const github = new Octokit({
-    auth: process.env.GITHUB_TOKEN,
+    auth: process.env.token,
   });
 
   const base = {
