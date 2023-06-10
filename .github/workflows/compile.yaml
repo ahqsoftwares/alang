@@ -98,7 +98,7 @@ jobs:
         id: assets
         uses: actions/github-script@v6
         env:
-          OS: ${{ martix.os }}
+          OS: ${{ matrix.os }}
         with:
           script: |
             const {
