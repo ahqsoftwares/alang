@@ -10,10 +10,10 @@ const osEs = {
 const [osName, installer] = osEs[process.env.OS.toLowerCase()];
 
 const cli = "./cli/target/release";
-const compiler = "./cli/target/compiler";
-const interpreter = "./cli/target/interpreter";
-const packager = "./cli/target/packager";
-const packloader = "./cli/target/packloader";
+const compiler = "./compiler/target/release";
+const interpreter = "./interpreter/target/release";
+const packager = "./packager/target/release";
+const packloader = "./packloader/target/release";
 
 const filesToZip = {
     linux: [
