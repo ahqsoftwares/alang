@@ -129,8 +129,6 @@ jobs:
           uurl: ${{ needs.create_release.outputs.upload_url }}
         with:
           script: |
-            console.log(process.env);
-
             const {
               tools,
               installer,
@@ -140,13 +138,14 @@ jobs:
 
             const fs = require("fs");
             const uploadUrl = process.env.uurl;
-            const assetPaths = [
+            const toUpload = [
               [tools, toolsName, "application/zip"],
               [installer, , installerName, "application/octet-stream"]
             ];
     
-            for (let i = 0; i < assetPaths.length; i++) {
-              const [assetPath, assetName, assetContentType] = assetPaths[i];
+            for (let i = 0; i < toUpload.length; i++) {
+              console.log(toUpload[i], JSON.parse(process.env.data));
+              const [assetPath, assetName, assetContentType] = toUpload[i];
 
               const contentLength = filePath => fs.statSync(filePath).size;
               const headers = { 'content-type': assetContentType, 'content-length': contentLength(assetPath) };
