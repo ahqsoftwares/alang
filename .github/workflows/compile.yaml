@@ -39,7 +39,7 @@ jobs:
               repo: context.repo.repo,
               tag_name: `lang-${version}`,
               name: `Alang v${version}`,
-              body: ,
+              body,
               draft: true,
               prerelease: false
             })
