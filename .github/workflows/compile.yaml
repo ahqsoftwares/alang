@@ -115,7 +115,7 @@ jobs:
           id: ${{ needs.create_release.outputs.release_id }}
 
       - name: Upload Tools ${{ matrix.os }}
-        uses: ahqsoftwares/upload-assets@v10
+        uses: ahqsoftwares/upload-assets@v11
         with:
           asset-path: ${{ steps.assets.outputs.result.tools }}
           id: ${{ needs.create_release.outputs.release_id }}
