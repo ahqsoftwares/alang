@@ -9,6 +9,7 @@
   "author": "AHQ Softwares",
   "license": "MIT",
   "dependencies": {
+    "adm-zip": "^0.5.10",
     "octokit": "^2.0.19",
     "toml": "^3.0.0"
   }

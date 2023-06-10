@@ -9,6 +9,7 @@ on:
 
 jobs:
   create_release:
+    name: Make draft release
     outputs:
       release_id: ${{ steps.create-release.outputs.result }}
     runs-on: ubuntu-latest
@@ -24,7 +25,7 @@ jobs:
         run: npm install .
         working-directory: js
 
-      - name: create release
+      - name: Create Release
         id: create-release
         uses: actions/github-script@v6
         with:
@@ -46,7 +47,7 @@ jobs:
             return data.id
 
   build_and_test:
-    needs: [create_release]
+    needs: create_release
     strategy:
       fail-fast: true
       matrix:
@@ -88,19 +89,34 @@ jobs:
       - name: Build Packloader
         run: cargo build --release
         working-directory: packloader
-      
-      - name: Archive Release
-        uses: thedoctor0/zip-release@0.7.1
+
+      - name: Install Packages
+        run: npm install .
+        working-directory: js
+
+      - name: Get Assets
+        id: assets
+        uses: actions/github-script@v6
         with:
-          type: 'zip'
-          filename: 'code.zip'
-          path: '.'
-      
-      - name: Upload
-        uses: actions/upload-artifact@v3
+          script: |
+            const {
+              installer,
+              tools
+            } = await require("./js/zip.js");
+
+            return {installer, tools}
+
+      - name: Upload Installer ${{ matrix.os }}
+        uses: ahqsoftwares/upload-assets@v10
         with:
-          name: ${{ matrix.os }}.zip
-          path: code.zip
+          asset-path: ${{ steps.assets.outputs.result.installer }}
+          id: ${{ needs.create_release.outputs.release_id }}
+
+      - name: Upload Tools ${{ matrix.os }}
+        uses: ahqsoftwares/upload-assets@v10
+        with:
+          asset-path: ${{ steps.assets.outputs.result.tools }}
+          id: ${{ needs.create_release.outputs.release_id }}
 
       
 
