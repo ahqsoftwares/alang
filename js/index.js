@@ -9,7 +9,7 @@ const { package: { version } } = toml.parse(
 
 const body = String(readFileSync("./latest.md"));
 
-return {
+module.exports = {
     version,
     body
 }
