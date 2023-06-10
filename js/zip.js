@@ -58,8 +58,8 @@ const installerPath = `./${installerName}`;
 fs.copyFileSync(installer, installerPath);
 
 module.exports = {
-    installer: `./js/${installerName}`,
-    tools: `./js/${toolsPath}`,
+    installer: installerPath,
+    tools: toolsPath,
     name: {
         tools: toolsName,
         installer: installerName
