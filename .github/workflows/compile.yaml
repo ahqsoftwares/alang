@@ -119,6 +119,7 @@ jobs:
           uurl: ${{ needs.create_release.outputs.upload_url }}
         with:
           script: |
+            const fs = require("fs");
             const uploadUrl = process.env.uurl;
             const assetPaths = [
               [process.env.toolsPath, process.env.toolsName, "application/zip"],
