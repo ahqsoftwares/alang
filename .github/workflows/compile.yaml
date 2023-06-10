@@ -129,18 +129,13 @@ jobs:
           uurl: ${{ needs.create_release.outputs.upload_url }}
         with:
           script: |
-            const {
-              tools,
-              installer,
-              toolsName,
-              installerName
-            } = JSON.parse(process.env.data);
+            const jsonParsed = JSON.parse(process.env.data);
 
             const fs = require("fs");
             const uploadUrl = process.env.uurl;
             const toUpload = [
-              [tools, toolsName, "application/zip"],
-              [installer, , installerName, "application/octet-stream"]
+              [jsonParsed.tools, jsonParsed.toolsName, "application/zip"],
+              [jsonParsed.installer, jsonParsed.installerName, "application/octet-stream"]
             ];
     
             for (let i = 0; i < toUpload.length; i++) {
