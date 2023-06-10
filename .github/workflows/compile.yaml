@@ -47,7 +47,6 @@ jobs:
 
   build_and_test:
     strategy:
-      max-parallel: 1
       fail-fast: true
       matrix:
         os: [windows-latest, macos-latest, ubuntu-latest]
