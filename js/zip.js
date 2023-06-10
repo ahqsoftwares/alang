@@ -3,15 +3,16 @@ const fs = require("fs");
 const { Octokit } = require("octokit");
 
 module.exports = (async () => {
+  const cli = "./cli/target/release";
+
   const osEs = {
-    "ubuntu-latest": ["linux", "./target/release/alang"],
-    "macos-latest": ["macos", "./target/release/alang"],
-    "windows-latest": ["windows", "./target/release/alang.exe"],
+    "ubuntu-latest": ["linux", "./target/release/alang", `${cli}/alang`],
+    "macos-latest": ["macos", "./target/release/alang", `${cli}/alang`],
+    "windows-latest": ["windows", "./target/release/alang.exe", `${cli}/alang.exe`],
   };
 
-  const [osName, installer] = osEs[process.env.OS.toLowerCase()];
+  const [osName, installer, alangCli] = osEs[process.env.OS.toLowerCase()];
 
-  const cli = "./cli/target/release";
   const compiler = "./compiler/target/release";
   const interpreter = "./interpreter/target/release";
   const packager = "./packager/target/release";
@@ -19,21 +20,18 @@ module.exports = (async () => {
 
   const filesToZip = {
     linux: [
-      `${cli}/cli`,
       `${compiler}/compiler`,
       `${interpreter}/interpreter`,
       `${packager}/packager`,
       `${packloader}/packloader`,
     ],
     macos: [
-      `${cli}/cli`,
       `${compiler}/compiler`,
       `${interpreter}/interpreter`,
       `${packager}/packager`,
       `${packloader}/packloader`,
     ],
     windows: [
-      `${cli}/cli.exe`,
       `${compiler}/compiler.exe`,
       `${interpreter}/interpreter.exe`,
       `${packager}/packager.exe`,
@@ -93,6 +91,15 @@ module.exports = (async () => {
     ...base,
     name: data.name.installer,
     data: fs.readFileSync(data.installer),
+    headers: {
+      "Content-Type": "application/octet-stream",
+    }
+  });
+
+  await github.rest.repos.uploadReleaseAsset({
+    ...base,
+    name: `cli_${osName}${osName == "windows" ? ".exe" : ""}`,
+    data: fs.readFileSync(alangCli),
     headers: {
       "Content-Type": "application/octet-stream",
     }

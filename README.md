@@ -1,3 +1,4 @@
+[![ALang Builder Action](https://github.com/ahqsoftwares/alang/actions/workflows/buildmake.yaml/badge.svg?branch=master)](https://github.com/ahqsoftwares/alang/actions/workflows/buildmake.yaml)
 # Alang - A new experimental language
 > Note ⚠️
 >
