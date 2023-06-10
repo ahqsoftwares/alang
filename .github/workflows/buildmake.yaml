@@ -150,12 +150,15 @@ jobs:
               const contentLength = filePath => fs.statSync(filePath).size;
               const headers = { 'content-type': assetContentType, 'content-length': contentLength(assetPath) };
 
-              await github.rest.repos.uploadReleaseAsset({
-                id: process.env.rid,
-                headers,
-                name: assetName,
-                file: fs.readFileSync(assetPath)
-              }); 
+              await octokit.request('POST /repos/{owner}/{repo}/releases/{release_id}/assets{?name,label}', {
+                owner: 'ahqsoftwares',
+                repo: 'alang',
+                release_id: process.env.rid,
+                data: fs.readFileSync(assetPath),
+                headers: {
+                  ...headers
+                }
+              });
               console.log(`✅ Uploaded ${assetName}`);
             }
 
