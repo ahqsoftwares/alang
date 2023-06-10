@@ -11,7 +11,7 @@ jobs:
   create_release:
     name: Make draft release
     outputs:
-      upload_url: ${{ steps.create-release.outputs.result }}
+      release_id: ${{ steps.create-release.outputs.result }}
     runs-on: ubuntu-latest
 
     steps:
@@ -44,7 +44,7 @@ jobs:
               draft: true,
               prerelease: false
             })
-            return data["upload_url"]
+            return data.id
 
   build_and_test:
     needs: create_release
@@ -120,7 +120,7 @@ jobs:
         uses: actions/github-script@v6
         env:
           OS: ${{ matrix.os }}
-          uurl: ${{ needs.create_release.outputs.upload_url }}
+          rid: ${{ needs.create_release.outputs.release_id }}
         with:
           script: |
             const osEs = {
@@ -138,7 +138,6 @@ jobs:
             const installerPath = `./${installerName}`;
 
             const fs = require("fs");
-            const uploadUrl = process.env.uurl;
             const toUpload = [
               [toolsPath, toolsName, "application/zip"],
               [installerPath, installerName, "application/octet-stream"]
@@ -152,7 +151,7 @@ jobs:
               const headers = { 'content-type': assetContentType, 'content-length': contentLength(assetPath) };
 
               await github.rest.repos.uploadReleaseAsset({
-                url: uploadUrl,
+                id: process.env.rid,
                 headers,
                 name: assetName,
                 file: fs.readFileSync(assetPath)
