@@ -67,6 +67,18 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          prefix-key: ${{ matrix.os }}
+          workspaces: |
+            . -> target
+            cli -> target
+            compiler -> target
+            interpreter -> target
+            packager -> target
+            packloader -> target
+
       - name: Build Lang
         run: cargo build --release
 
