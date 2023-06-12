@@ -35,6 +35,7 @@ jobs:
         id: get-release-data
         uses: actions/github-script@v6
         with:
+          result-encoding: string
           script: |
             const {
               version
@@ -46,7 +47,7 @@ jobs:
         id: create-release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ steps.get-release-data.outputs.result }}
+          tag_name: lang-${{ steps.get-release-data.outputs.result }}
           name: ALang ${{ steps.get-release-data.outputs.result }}
           body_path: ./latest.md
           files: ./templates.zip

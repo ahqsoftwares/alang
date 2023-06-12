@@ -265,7 +265,7 @@ fn main() {
 
                 if res.is_err() {
                     info(
-                        format!("> Could not allow exec perms for the install <\n> Run `sudo chmod {}/**/*` <", &data),
+                        format!("> Could not allow exec perms for the install <\n> Run `sudo chmod {}/**/*` <", &data).as_str(),
                     );
                 }
             }
