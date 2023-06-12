@@ -1,0 +1,14 @@
+//global: Whose value is None before compile time
+.global {
+
+};
+
+//stated: whose value is known before compile time
+.stated {
+
+};
+
+//global: Whose value never changes after compile
+.constants {
+
+};

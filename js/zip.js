@@ -3,15 +3,16 @@ const fs = require("fs");
 const { Octokit } = require("octokit");
 
 module.exports = (async () => {
-  const cli = "./cli/target/release";
+  const cli = "./cli/target/release/alang";
+  const updater = "./updater/target/release/updater";
 
   const osEs = {
-    "ubuntu-latest": ["linux", "./target/release/alang", `${cli}/alang`],
-    "macos-latest": ["macos", "./target/release/alang", `${cli}/alang`],
-    "windows-latest": ["windows", "./target/release/alang.exe", `${cli}/alang.exe`],
+    "ubuntu-latest": ["linux", "./target/release/alang", cli, updater],
+    "macos-latest": ["macos", "./target/release/alang", cli, updater],
+    "windows-latest": ["windows", "./target/release/alang.exe", `${cli}.exe`, `${updater}.exe`],
   };
 
-  const [osName, installer, alangCli] = osEs[process.env.OS.toLowerCase()];
+  const [osName, installer, alangCli, alangUpdater] = osEs[process.env.OS.toLowerCase()];
 
   const compiler = "./compiler/target/release";
   const interpreter = "./interpreter/target/release";
@@ -100,6 +101,15 @@ module.exports = (async () => {
     ...base,
     name: `cli_${osName}${osName == "windows" ? ".exe" : ""}`,
     data: fs.readFileSync(alangCli),
+    headers: {
+      "Content-Type": "application/octet-stream",
+    }
+  });
+
+  await github.rest.repos.uploadReleaseAsset({
+    ...base,
+    name: `updater_${osName}${osName == "windows" ? ".exe" : ""}`,
+    data: fs.readFileSync(alangUpdater),
     headers: {
       "Content-Type": "application/octet-stream",
     }

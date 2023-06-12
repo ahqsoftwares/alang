@@ -1,4 +1,4 @@
-use clap::{arg, crate_version, Command as CliCommand};
+use clap::{crate_version, Command as CliCommand};
 
 static mut VER: Option<String> = None;
 
@@ -16,16 +16,21 @@ fn main() {
                     .alias("ver"),
             )
             .subcommand(
+                CliCommand::new("compile")
+                    .about("Compile the ALang Project"),
+            )
+            .subcommand(
+                CliCommand::new("run")
+                    .about("Compile & Run the ALang Project"),
+            )
+            .subcommand(
                 CliCommand::new("init")
-                .about("Initialize an ALang project inside the current dir")
-                .arg_required_else_help(true),
+                    .about("Initialize an ALang project inside the current dir"),
             )
             .subcommand(
                 CliCommand::new("new")
-                    .about("Initialize an ALang project inside the current dir")
-                    .alias("create")
-                    .arg(arg!([DIR]))
-                    .arg_required_else_help(true),
+                    .about("Initialize a new ALang project")
+                    .alias("create"),
             )
     };
 
@@ -38,6 +43,8 @@ fn main() {
 
         println!("ALang Cli v{}", &data);
     } else if let Some(_) = matches.subcommand_matches("init") {
+        
+    } else if let Some(_) = matches.subcommand_matches("new") {
         
     } else {
         let _ = &cloned_cmd.print_help();

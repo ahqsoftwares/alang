@@ -1,0 +1,8 @@
+@impl std;
+
+@link variables.main.css;
+
+@main {
+    //@: Run a function, strings cannot be declared in the code section
+    @print @@helloWorld;
+};

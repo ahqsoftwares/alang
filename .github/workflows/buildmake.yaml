@@ -25,26 +25,31 @@ jobs:
         run: npm install .
         working-directory: js
 
-      - name: Create Release
-        id: create-release
+      - name: Install zip
+        run: sudo apt install zip
+
+      - name: Zip Dir
+        run: zip -r templates.zip templates
+
+      - name: Get Release Data
+        id: get-release-data
         uses: actions/github-script@v6
         with:
           script: |
             const {
-              body,
               version
             } = await require("./js/index.js");
 
-            const { data } = await github.rest.repos.createRelease({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              tag_name: `lang-${version}`,
-              name: `Alang v${version}`,
-              body,
-              draft: true,
-              prerelease: false
-            })
-            return data.id
+            return version;
+
+      - name: Release
+        id: create-release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ needs.get-release-data.outputs.result }}
+          body_path: ./latest.md
+          files: ./templates.zip
+
 
   build_and_test:
     needs: create_release

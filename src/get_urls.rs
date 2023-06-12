@@ -73,7 +73,8 @@ pub fn get_urls() -> Urls {
     assets.assets.iter().for_each(|asset| {
         let asset = asset.clone().to_owned();
 
-        if &asset.name.contains("installer") == &false {
+        //ignore the installers & updaters
+        if &asset.name.contains("installer") == &false && &asset.name.contains("updater") == &false {
             url.push(ParsedAsset {
                 class: (|| {
                     let name = asset.name.clone();

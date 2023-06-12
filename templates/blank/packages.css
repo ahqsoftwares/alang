@@ -3,10 +3,10 @@
 ]
 
 .modules [
-    "subscript"
+    
 ]
 
 .config {
     @pubdir /target
-    @package ["win32", "linux", "macos"]
+    @package ["win", "linux", "macos"]
 }

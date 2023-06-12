@@ -1,16 +1,24 @@
 use std::{
     fs,
     io::{stdin, ErrorKind, Read},
-    process,
+    panic::catch_unwind,
+    process, time::{UNIX_EPOCH, SystemTime},
 };
 
 use chalk_rs::Chalk;
 use inquire::{Confirm, Text};
 
+#[cfg(target_os = "linux")]
+mod permission;
 mod download;
 mod get_urls;
 use download::*;
 use get_urls::*;
+
+#[cfg(target_os = "linux")]
+use permission::*;
+
+use zip::read::ZipArchive;
 
 fn main() {
     let ver = env!("CARGO_PKG_VERSION");
@@ -170,13 +178,56 @@ fn main() {
             }
 
             #[cfg(windows)]
-            let _to_extract = format!("{}/downloads/tools_windows.zip", &data);
+            let to_extract = format!("{}/downloads/tools_windows.zip", &data);
 
             #[cfg(target_os = "macos")]
-            let _to_extract = format!("{}/downloads/tools_macos.zip", &data);
+            let to_extract = format!("{}/downloads/tools_macos.zip", &data);
 
             #[cfg(target_os = "linux")]
-            let _to_extract = format!("{}/downloads/tools_linux.zip", &data);
+            let to_extract = format!("{}/downloads/tools_linux.zip", &data);
+
+            let make_config = catch_unwind(|| {
+                let now = SystemTime::now();
+                let dur = now.duration_since(UNIX_EPOCH).unwrap().as_secs();
+
+                fs::write(format!("{}/updated", &data), format!("{}", dur)).unwrap();
+            }).is_ok();
+
+            #[cfg(windows)]
+            let copy = fs::copy(
+                format!("{}\\downloads\\cli_windows.exe", &data), 
+                format!("{}\\alang.exe", &data)
+            ).is_ok() && make_config;
+
+            #[cfg(target_os = "linux")]
+            let copy = fs::copy(
+                format!("{}\\downloads\\cli_linux", &data), 
+                format!("{}\\alang", &data)
+            ).is_ok() && make_config;
+
+            #[cfg(target_os = "macos")]
+            let copy = fs::copy(
+                format!("{}\\downloads\\cli_macos", &data), 
+                format!("{}\\alang", &data)
+            ).is_ok() && make_config;
+
+            if !copy {
+                err("> Failed to install alang...");
+            }
+
+            let extract_dest = format!("{}/tools", &data);
+
+            let ok = catch_unwind(move || {
+                let zip_file = fs::File::open(to_extract).unwrap();
+
+                let mut tools_zip = ZipArchive::new(zip_file).unwrap();
+
+                tools_zip.extract(extract_dest).unwrap();
+            }).is_ok();
+
+            if !ok {
+                err("> Failed to install alang tools...");
+            }
 
             success("> ALang has been installed! 🎉");
 
@@ -205,6 +256,19 @@ fn main() {
                 .bold()
                 .print(&"Add the above install dir to your path variable");
             println!(" <");
+
+            #[cfg(target_os = "linux")]
+            {
+                let res = catch_unwind(|| {
+                    give_perms(data.clone());
+                });
+
+                if res.is_err() {
+                    info(
+                        format!("> Could not allow exec perms for the install <\n> Run `sudo chmod {}/**/*` <", &data),
+                    );
+                }
+            }
 
             println!("-------------------------------------------------------");
 
@@ -253,7 +317,7 @@ fn err(data: &str) {
 
     chalk.red().bold().println(&data);
 
-    info("Press enter key to exit");
+    info("Please delete the existing files on the install dir\nPress enter key to exit");
 
     let mut buf = [0; 1];
     let _ = stdin().read_exact(&mut buf);

@@ -1,0 +1,12 @@
+.packages [
+    "std"
+]
+
+.modules [
+    
+]
+
+.config {
+    @pubdir /target
+    @package ["win", "linux", "macos"]
+}
