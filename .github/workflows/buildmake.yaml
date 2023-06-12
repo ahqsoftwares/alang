@@ -47,8 +47,10 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.get-release-data.outputs.result }}
+          name: ALang ${{ steps.get-release-data.outputs.result }}
           body_path: ./latest.md
           files: ./templates.zip
+          draft: true
 
 
   build_and_test:
