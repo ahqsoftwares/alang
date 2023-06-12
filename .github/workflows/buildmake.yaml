@@ -11,7 +11,7 @@ jobs:
   create_release:
     name: Make draft release
     outputs:
-      release_id: ${{ steps.create-release.outputs.result }}
+      release_id: ${{ steps.create-release.outputs.id }}
     runs-on: ubuntu-latest
 
     steps:
@@ -48,7 +48,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: lang-${{ steps.get-release-data.outputs.result }}
-          name: ALang ${{ steps.get-release-data.outputs.result }}
+          name: ALang v${{ steps.get-release-data.outputs.result }}
           body_path: ./latest.md
           files: ./templates.zip
           draft: true
