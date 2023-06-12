@@ -46,7 +46,7 @@ jobs:
         id: create-release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ steps.get-release-data.result }}
+          tag_name: ${{ steps.get-release-data.outputs.result }}
           body_path: ./latest.md
           files: ./templates.zip
 
