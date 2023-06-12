@@ -74,7 +74,7 @@ pub fn get_urls() -> Urls {
         let asset = asset.clone().to_owned();
 
         //ignore the installers & updaters
-        if &asset.name.contains("installer") == &false && &asset.name.contains("updater") == &false {
+        if &asset.name != &String::from("templates.zip") && &asset.name.contains("installer") == &false && &asset.name.contains("updater") == &false {
             url.push(ParsedAsset {
                 class: (|| {
                     let name = asset.name.clone();
