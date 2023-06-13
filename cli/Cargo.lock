@@ -4,10 +4,12 @@ version = 3
 
 [[package]]
 name = "alang"
-version = "0.0.4"
+version = "0.0.5"
 dependencies = [
+ "chalk_rs",
  "clap",
  "reqwest",
+ "serde",
 ]
 
 [[package]]
@@ -100,6 +102,15 @@ name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
+
+[[package]]
+name = "chalk_rs"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "642a18ae7e20e675030c6e775f1d44c489d3c468a048b7420a095f2a2c38cdc4"
+dependencies = [
+ "winapi",
+]
 
 [[package]]
 name = "clap"
@@ -743,6 +754,20 @@ name = "serde"
 version = "1.0.164"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9e8c8cf938e98f769bc164923b06dce91cea1751522f46f8466461af04c9027d"
+dependencies = [
+ "serde_derive",
+]
+
+[[package]]
+name = "serde_derive"
+version = "1.0.164"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d9735b638ccc51c28bf6914d90a2e9725b377144fc612c49a611fddd1b631d68"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
 
 [[package]]
 name = "serde_json"

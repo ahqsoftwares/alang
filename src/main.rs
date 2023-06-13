@@ -5,6 +5,7 @@ use std::{
     process, time::{UNIX_EPOCH, SystemTime},
 };
 
+use indicatif::{ProgressBar, ProgressDrawTarget};
 use chalk_rs::Chalk;
 use inquire::{Confirm, Text};
 
@@ -19,6 +20,8 @@ use get_urls::*;
 use permission::*;
 
 use zip::read::ZipArchive;
+
+static mut PROGRESSBAR: Option<ProgressBar> = None;
 
 fn main() {
     let ver = env!("CARGO_PKG_VERSION");
@@ -79,45 +82,75 @@ fn main() {
                 .for_each(|asset| match &asset.class {
                     AssetClass::WindowsCli => {
                         info("  > Downloading ALang Cli for Windows");
+                        let bar: ProgressBar = ProgressBar::new(100);
+                        bar.set_draw_target(ProgressDrawTarget::stdout());
+
+                        unsafe {
+                            PROGRESSBAR = Some(bar);
+                        }
+
                         download(
                             asset.url.clone(),
                             format!("{}/downloads", &data),
                             "cli_windows.exe".to_owned(),
-                            |current, total| {
-                                println!(
-                                    "      > {}% downloaded (Windows Cli)",
-                                    (current * 100) / total
-                                );
+                            |c, t| {
+                                unsafe {
+                                    let perc = (c * 100) / t;
+
+                                    PROGRESSBAR.as_ref().unwrap().set_position(perc);
+                                }
                             },
                         );
+
+                        unsafe{PROGRESSBAR.as_ref().unwrap().finish();}
                     }
                     AssetClass::MacosCli => {
                         info("  > Downloading ALang Cli for Macos");
+                        let bar = ProgressBar::new(100);
+                        bar.set_draw_target(ProgressDrawTarget::stdout());
+
+                        unsafe {
+                            PROGRESSBAR = Some(bar);
+                        }
+
                         download(
                             asset.url.clone(),
                             format!("{}/downloads", &data),
                             "cli_macos".to_owned(),
                             |current, total| {
-                                println!(
-                                    "      > {}% downloaded (Macos Cli)",
-                                    (current * 100) / total
-                                );
+                                unsafe {
+                                    let perc = (current * 100) / total;
+
+                                    PROGRESSBAR.as_ref().unwrap().set_position(perc);
+                                }
                             },
                         );
+
+                        unsafe{PROGRESSBAR.as_ref().unwrap().finish();}
                     }
                     AssetClass::LinuxCli => {
                         info("  > Downloading ALang Cli for Linux");
+                        let bar = ProgressBar::new(100);
+                        bar.set_draw_target(ProgressDrawTarget::stdout());
+
+                        unsafe {
+                            PROGRESSBAR = Some(bar);
+                        }
+
                         download(
                             asset.url.clone(),
                             format!("{}/downloads", &data),
                             "cli_linux".to_owned(),
                             |current, total| {
-                                println!(
-                                    "      > {}% downloaded (Linux Cli)",
-                                    (current * 100) / total
-                                );
+                                unsafe {
+                                    let perc = (current * 100) / total;
+
+                                    PROGRESSBAR.as_ref().unwrap().set_position(perc);
+                                }
                             },
                         );
+
+                        unsafe{PROGRESSBAR.as_ref().unwrap().finish();}
                     }
                     _ => {}
                 });
@@ -130,41 +163,103 @@ fn main() {
                 .assets
                 .iter()
                 .for_each(|asset| match &asset.class {
+                    AssetClass::CodeTemplates => {
+                        info("  > Downloading ALang Code Templates");
+                        let bar = ProgressBar::new(100);
+                        bar.set_draw_target(ProgressDrawTarget::stdout());
+
+                        unsafe {
+                            PROGRESSBAR = Some(bar);
+                        }
+
+                        download(
+                            asset.url.clone(),
+                            format!("{}/downloads", &data),
+                            "templates.zip".to_owned(),
+                            |current, total| {
+                                unsafe {
+                                    let progress = (current * 100) / total;
+                                    PROGRESSBAR.as_ref().unwrap().set_position(progress);
+                                }
+                            },
+                        );
+
+                        unsafe{PROGRESSBAR.as_ref().unwrap().finish();}
+                    }
                     AssetClass::WindowsTools => {
                         info("  > Downloading ALang Tools for Windows");
+
+                        let bar = ProgressBar::new(100);
+                        bar.set_draw_target(ProgressDrawTarget::stdout());
+
+                        unsafe {
+                            PROGRESSBAR = Some(bar);
+                        }
+
                         download(
                             asset.url.clone(),
                             format!("{}/downloads", &data),
                             "tools_windows.zip".to_owned(),
                             |current, total| {
-                                println!(
-                                    "      > {}% downloaded (Windows)",
-                                    (current * 100) / total
-                                );
+                                unsafe {
+                                    let perc = (current * 100) / total;
+
+                                    PROGRESSBAR.as_ref().unwrap().set_position(perc);
+                                }
                             },
                         );
+
+                        unsafe{PROGRESSBAR.as_ref().unwrap().finish();}
                     }
                     AssetClass::MacosTools => {
                         info("  > Downloading ALang Tools for Macos");
+                        
+                        let bar = ProgressBar::new(100);
+                        bar.set_draw_target(ProgressDrawTarget::stdout());
+
+                        unsafe {
+                            PROGRESSBAR = Some(bar);
+                        }
+
                         download(
                             asset.url.clone(),
                             format!("{}/downloads", &data),
                             "tools_macos.zip".to_owned(),
                             |current, total| {
-                                println!("      > {}% downloaded (Macos)", (current * 100) / total);
+                                unsafe {
+                                    let perc = (current * 100) / total;
+
+                                    PROGRESSBAR.as_ref().unwrap().set_position(perc);
+                                }
                             },
                         );
+
+                        unsafe{PROGRESSBAR.as_ref().unwrap().finish();}
                     }
                     AssetClass::LinuxTools => {
                         info("  > Downloading ALang Tools for Linux");
+
+                        let bar = ProgressBar::new(100);
+                        bar.set_draw_target(ProgressDrawTarget::stdout());
+
+                        unsafe {
+                            PROGRESSBAR = Some(bar);
+                        }
+
                         download(
                             asset.url.clone(),
                             format!("{}/downloads", &data),
                             "tools_linux.zip".to_owned(),
                             |current, total| {
-                                println!("      > {}% downloaded (Linux)", (current * 100) / total);
+                                unsafe {
+                                    let perc = (current * 100) / total;
+
+                                    PROGRESSBAR.as_ref().unwrap().set_position(perc);
+                                }
                             },
                         );
+
+                        unsafe{PROGRESSBAR.as_ref().unwrap().finish();}
                     }
                     _ => {}
                 });
@@ -201,28 +296,33 @@ fn main() {
 
             #[cfg(target_os = "linux")]
             let copy = fs::copy(
-                format!("{}\\downloads\\cli_linux", &data), 
-                format!("{}\\alang", &data)
+                format!("{}/downloads/cli_linux", &data), 
+                format!("{}/alang", &data)
             ).is_ok() && make_config;
 
             #[cfg(target_os = "macos")]
             let copy = fs::copy(
-                format!("{}\\downloads\\cli_macos", &data), 
-                format!("{}\\alang", &data)
+                format!("{}/downloads/cli_macos", &data), 
+                format!("{}/alang", &data)
             ).is_ok() && make_config;
 
             if !copy {
                 err("> Failed to install alang...");
             }
 
+            let templates_folder = format!("{}/downloads/templates.zip", &data);
             let extract_dest = format!("{}/tools", &data);
+            let temp_dest = format!("{}", &data);
 
             let ok = catch_unwind(move || {
                 let zip_file = fs::File::open(to_extract).unwrap();
+                let templates = fs::File::open(templates_folder).unwrap();
 
                 let mut tools_zip = ZipArchive::new(zip_file).unwrap();
+                let mut templates_zip = ZipArchive::new(templates).unwrap();
 
                 tools_zip.extract(extract_dest).unwrap();
+                templates_zip.extract(temp_dest).unwrap();
             }).is_ok();
 
             if !ok {

@@ -2,6 +2,8 @@ name: Build & Deploy Contect to Pages
 
 on:
   push:
+    paths:
+      - 'docs/**'
     branches: ["master"]
 
   workflow_dispatch:
@@ -37,7 +39,6 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
-          # Upload entire repository
           path: './docs/dist/'
       - name: Deploy to GitHub Pages
         id: deployment

@@ -1,3 +1,6 @@
 # What's new
-- Added an installer with better UI & UX
-- Nothing Else
+- The Installer is now ready 🎉
+- The installer now installs the following
+    1. Cli (with Updater in the future)
+    2. Build Tools
+    3. Templates

@@ -1,0 +1,15 @@
+<svg width="182" height="113" viewBox="0 0 182 113" fill="transparent" xmlns="http://www.w3.org/2000/svg">
+    <rect width="182" height="113" fill="transparent"/>
+    <path id="icon" d="M15.2741 113H0.963068L42.3551 0.272724H56.446L97.8381 113H83.527L49.8409 18.1065H48.9602L15.2741 113ZM20.5582 68.9659H78.2429V81.0753H20.5582V68.9659ZM115.397 113V0.272724H129.047V100.891H181.448V113H115.397Z" />
+    <style>
+        #icon {
+            fill: black;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            #icon {
+                fill: white;
+            }
+        }
+    </style>
+</svg>

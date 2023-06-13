@@ -24,6 +24,7 @@ pub enum AssetClass {
     LinuxCli,
     MacosCli,
     WindowsCli,
+    CodeTemplates
 }
 
 #[derive(Debug)]
@@ -74,13 +75,15 @@ pub fn get_urls() -> Urls {
         let asset = asset.clone().to_owned();
 
         //ignore the installers & updaters
-        if &asset.name != &String::from("templates.zip") && &asset.name.contains("installer") == &false && &asset.name.contains("updater") == &false {
+        if &asset.name.contains("installer") == &false && &asset.name.contains("updater") == &false {
             url.push(ParsedAsset {
                 class: (|| {
                     let name = asset.name.clone();
                     let name = name.as_str();
 
-                    if name == "tools-windows.zip" {
+                    if name == "templates.zip" {
+                        AssetClass::CodeTemplates
+                    } else if name == "tools-windows.zip" {
                         AssetClass::WindowsTools
                     } else if name == "tools-linux.zip" {
                         AssetClass::LinuxTools
