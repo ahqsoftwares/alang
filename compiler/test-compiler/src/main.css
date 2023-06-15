@@ -1,0 +1,10 @@
+@use std;
+
+@impl std::print, std::mutate;
+
+@link variables.main.css;
+
+@main {
+    //@: Run a function, strings cannot be declared in the code section
+    @print @@helloWorld;
+};

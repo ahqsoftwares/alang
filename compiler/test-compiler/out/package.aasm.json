@@ -1,0 +1,20 @@
+{
+  "name": "Alang Compiler Test",
+  "version": "0.0.1",
+  "description": null,
+  "license": "MIT",
+  "author": "ALang",
+  "config": {
+    "pubdir": "/target",
+    "package": [
+      "win",
+      "linux",
+      "macos"
+    ]
+  },
+  "packages": [
+    "std"
+  ],
+  "package_map": {},
+  "modules": []
+}

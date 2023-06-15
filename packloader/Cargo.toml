@@ -1,9 +1,14 @@
 [package]
 name = "packloader"
-version = "0.0.5"
+version = "0.0.6"
 edition = "2021"
 description = "The Alang Pack Loader"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+clap = { version = "4.3.4", features = ["cargo"] }
+downloader = "0.2.7"
+reqwest = { version = "0.11.18", features = ["blocking"] }
+serde = { version = "1.0.164", features = ["derive"] }
+serde_json = "1.0.96"

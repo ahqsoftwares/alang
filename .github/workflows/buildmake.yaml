@@ -86,6 +86,7 @@ jobs:
             interpreter -> target
             packager -> target
             packloader -> target
+            updater -> target
 
       - name: Build Installer
         run: cargo build --release

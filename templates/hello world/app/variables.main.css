@@ -1,7 +1,7 @@
 //global: Whose value is None before compile time
-.global {
+.global [
 
-};
+];
 
 //stated: whose value is known before compile time
 .stated {
