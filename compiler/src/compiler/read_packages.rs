@@ -1,16 +1,24 @@
-use crate::{get_out, Package};
+use crate::{get_out, Package, warn};
 use serde_json::{from_str, to_string_pretty};
 
-use std::fs;
+use std::{fs, path::Path};
 
 pub fn get_package(dir: &String) -> Package {
     let path = get_out(&dir);
 
-    fs::create_dir_all(&path).unwrap_or(());
-
     let package_string = read_package(&dir);
 
     let splits = split_package(package_string);
+
+    fs::create_dir_all(&path).unwrap_or(());
+
+    remove_dir_contents(
+        &path
+    ).unwrap_or(());
+
+    fs::create_dir_all(
+        format!("{}/packages", &path)
+    ).unwrap_or(());
 
     read(splits, &path)
 }
@@ -25,7 +33,7 @@ fn read(splits: Vec<String>, dir: &String) -> Package {
             .map(ToString::to_string)
             .collect::<Vec<String>>();
 
-        let first = string[0].clone();
+        let first = string[0].clone().trim().to_string();
         let first = first.as_str();
 
         let second = string.join(" ").replace(&first, "").clone();
@@ -48,6 +56,10 @@ fn read(splits: Vec<String>, dir: &String) -> Package {
             package.modules = Some(from_str(second.as_str()).unwrap());
         } else if first == ".config" {
             package.config = Some(from_str(second.as_str()).unwrap());
+        } else {
+            warn(
+                format!("Unknown Package Syntax: {}", first)
+            );
         }
     }
 
@@ -70,7 +82,24 @@ fn split_package(package_string: String) -> Vec<String> {
                 .replace("\r", "")
                 /* Replaces Legacy '@' */
                 .replace("@", "")
+                .trim()
+                .to_string()
         })
         .filter(|s| s != "")
         .collect()
+}
+
+fn remove_dir_contents<P: AsRef<Path>>(path: P) -> std::io::Result<()> {
+    for entry in fs::read_dir(path)? {
+        let entry = entry?;
+        let path = entry.path();
+
+        if entry.file_type()?.is_dir() {
+            remove_dir_contents(&path)?;
+            fs::remove_dir(path)?;
+        } else {
+            fs::remove_file(path)?;
+        }
+    }
+    Ok(())
 }

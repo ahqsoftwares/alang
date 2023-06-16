@@ -85,7 +85,6 @@ fn copy_dir(a: String, dest: String) {
                     &path,
                     &dest_file
                 ) {
-                    println!("{:#?}\n{}", e, format!("{}/{}", &a, &entry.file_name));
                     error("Could not populate the directory!");
                 }
             }

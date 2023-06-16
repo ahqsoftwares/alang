@@ -4,7 +4,7 @@
 //global variables can only be registered in variables.main
 
 .global [
-    
+
 ];
 
 //stated: whose value is known before compile time
@@ -13,13 +13,14 @@
 //The interpreter treats the data as json object.
 
 .stated {
-
+    
 };
 
 //constants: Whose value never changes after compile
 //NOTE ⚠️
 //The interpreter treats the data as json object.
+//{{;}} hides the semicolon from being detected as line end
 
 .constants {
-    "helloWorld": "Hello World, This app was written using ALang"
+    "helloWorld": "Hello World{{;}} This app was written using ALang"
 };

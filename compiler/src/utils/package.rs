@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use std::collections::HashMap;
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
@@ -28,16 +29,14 @@ pub enum Var {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Variable {
-    pub name: String,
-    pub value: Option<String>,
-    pub var_type: Var,
+pub enum VariableValue {
+    None,
+    Val(Value),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum Log {
-    Variables(Vec<Variable>),
-    Code(Vec<String>),
+pub struct Variable {
+    pub name: String,
+    pub value: VariableValue,
+    pub var_type: Var,
 }
-
-pub type InterpreterLog = HashMap<String, Log>;

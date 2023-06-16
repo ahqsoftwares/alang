@@ -5,6 +5,8 @@ use std::env::current_dir;
 
 use read_packages::get_package;
 
+use crate::{info, success};
+
 pub fn compile(dir: String) {
     let dir = (|| {
         let dir = dir.clone();
@@ -17,6 +19,11 @@ pub fn compile(dir: String) {
         }
     })();
 
+    info("Compiling Package");
+
     let _ = get_package(&dir);
+
+    success("Compiled Package");
+
     let _ = compile_code::compile(&dir);
 }
