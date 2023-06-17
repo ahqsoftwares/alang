@@ -3,16 +3,21 @@ use std::env::current_dir;
 use chalk_rs::Chalk;
 
 use check_update::check_update;
-use clap::{crate_version, Command as CliCommand};
+use clap::{arg, crate_version, Command as CliCommand};
 
-use project_create::{dir_empty, err_not_empty, err_reading_dir, get_project_name, get_template, install_template};
+use compiler::compile_code;
+use project_create::{
+    dir_empty, err_not_empty, err_reading_dir, get_project_name, get_template, install_template,
+};
 
 use utils::{error, info, launch, show_notes};
 
 static mut VER: Option<String> = None;
 
 mod check_update;
+mod compiler;
 mod project_create;
+mod updater;
 
 pub mod check_config;
 pub mod utils;
@@ -36,7 +41,12 @@ fn main() {
                     .alias("notes"),
             )
             .subcommand(CliCommand::new("update").about("Update ALang Cli (if available)"))
-            .subcommand(CliCommand::new("compile").about("Compile the ALang Project"))
+            .subcommand(
+                CliCommand::new("compile")
+                    .about("Compile the ALang Project")
+                    .arg(arg!(-v --verboose "Print verbose information"))
+                    .arg(arg!(-w --workspace [WORKSPACE] "Specify a workspace")),
+            )
             .subcommand(CliCommand::new("run").about("Compile & Run the ALang Project"))
             .subcommand(
                 CliCommand::new("init").about("Initialize an ALang project inside the current dir"),
@@ -63,10 +73,7 @@ fn main() {
             if let Some(dir) = dir.to_str() {
                 if dir_empty(&dir.to_string()) {
                     let template = get_template();
-                    install_template(
-                        dir.to_string(),
-                        template
-                    );
+                    install_template(dir.to_string(), template);
                 } else {
                     err_not_empty();
                 }
@@ -82,13 +89,8 @@ fn main() {
 
         if let Ok(dir) = current_dir() {
             if let Some(dir) = dir.to_str() {
-                if dir_empty(
-                    &format!("{}/{}", &dir, &project)
-                ) {
-                    install_template(
-                        format!("{}/{}", &dir, &project),
-                        template
-                    );
+                if dir_empty(&format!("{}/{}", &dir, &project)) {
+                    install_template(format!("{}/{}", &dir, &project), template);
                 } else {
                     err_not_empty();
                 }
@@ -108,7 +110,24 @@ fn main() {
             }
         }
     } else if let Some(_) = matches.subcommand_matches("update") {
-        info("Coming Soon...");
+        updater::update();
+    } else if let Some(arg) = matches.subcommand_matches("compile") {
+        let verboose = (|| {
+            if let Ok(arg) = arg.try_get_one::<bool>("verboose") {
+                *arg.unwrap_or(&false)
+            } else {
+                false
+            }
+        })();
+        let workspace = (|| {
+            if let Ok(arg) = arg.try_get_one::<String>("workspace") {
+                arg.unwrap_or(&".".to_string()).clone()
+            } else {
+                ".".to_string()
+            }
+        })();
+
+        compile_code(workspace, verboose);
     } else {
         let _ = &cloned_cmd.print_help();
     }

@@ -86,7 +86,6 @@ jobs:
             interpreter -> target
             packager -> target
             packloader -> target
-            updater -> target
 
       - name: Build Installer
         run: cargo build --release
@@ -110,10 +109,6 @@ jobs:
       - name: Build Packloader
         run: cargo build --release
         working-directory: packloader
-
-      - name: Build Updater
-        run: cargo build --release
-        working-directory: updater
 
       - name: Install Packages
         run: npm install .

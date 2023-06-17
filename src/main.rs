@@ -2,17 +2,18 @@ use std::{
     fs,
     io::{stdin, ErrorKind, Read},
     panic::catch_unwind,
-    process, time::{UNIX_EPOCH, SystemTime},
+    process,
+    time::{SystemTime, UNIX_EPOCH, Duration}, env, thread,
 };
 
-use indicatif::{ProgressBar, ProgressDrawTarget};
 use chalk_rs::Chalk;
+use indicatif::{ProgressBar, ProgressDrawTarget};
 use inquire::{Confirm, Text};
 
-#[cfg(target_os = "linux")]
-mod permission;
 mod download;
 mod get_urls;
+#[cfg(target_os = "linux")]
+mod permission;
 use download::*;
 use get_urls::*;
 
@@ -24,7 +25,18 @@ use zip::read::ZipArchive;
 static mut PROGRESSBAR: Option<ProgressBar> = None;
 
 fn main() {
+    let mut i = 0;
+    let args = env::args().collect::<Vec<String>>().iter().filter(|_| {
+        i += 1;
+        i != 1
+    }).map(|x|x.to_string()).collect::<Vec<String>>();
+
+    if !args.is_empty() {
+        println!("{:#?}", args);
+    }
+
     let ver = env!("CARGO_PKG_VERSION");
+    
     #[cfg(windows)]
     let os = "Windows";
 
@@ -46,21 +58,50 @@ fn main() {
         }
     })());
 
-    let prompt = text.prompt();
+    let prompt = (|| {
+        if args.len() == 0 || args[0].as_str() != "-f" {
+            text.prompt()
+        } else {
+            info("> Treating the file path as updater");
+            info("> Will Wipe the Directory in case it exists & contains files");
+            info("> If symlinks are used it will remove the symlink itself");
+            red("> Please run Ctrl+C if alang cli didn't ran this command.", false);
+            red("> You have 10secs", false);
+            
+            thread::sleep(Duration::from_secs(3));
+            
+            for i in 0..10 {
+                info(format!("> Preparing to install in {}secs\nUse Ctrl+C if `alang update` command didn't ran it\n", 10 - i).as_str());
+                thread::sleep(Duration::from_secs(1));
+            }
+            Ok(args[1].to_string())
+        }
+    })();
 
     if let Ok(data) = prompt {
         if is_symlink(data.clone()) {
             err("> Sorry, please use only absolute paths (the current path was found as symlink)");
         }
 
-        let confirm = Confirm::new(format!("Install alang at {}?", &data).as_str())
-            .with_default(true)
-            .prompt();
+        let confirm = (|| {
+            if args.len() == 0 || args[0].as_str() != "-f" {
+                Confirm::new(format!("Install alang at {}?", &data).as_str())
+                    .with_default(true)
+                    .prompt()
+            } else {
+                Ok(true)
+            }
+        })();
 
         if let Ok(true) = confirm {
             if let Ok(dir) = fs::read_dir(&data) {
                 if dir.count() != 0 {
-                    err("The selected directory contains files");
+                    if args.len() == 0 || args[0].as_str() != "-f" {
+                        err("The selected directory contains files");
+                    } else {
+                        red("The dir contains files; Foce Removing the dir", false);
+                        fs::remove_dir_all(&data).unwrap();
+                    }
                 }
             }
 
@@ -93,16 +134,16 @@ fn main() {
                             asset.url.clone(),
                             format!("{}/downloads", &data),
                             "cli_windows.exe".to_owned(),
-                            |c, t| {
-                                unsafe {
-                                    let perc = (c * 100) / t;
+                            |c, t| unsafe {
+                                let perc = (c * 100) / t;
 
-                                    PROGRESSBAR.as_ref().unwrap().set_position(perc);
-                                }
+                                PROGRESSBAR.as_ref().unwrap().set_position(perc);
                             },
                         );
 
-                        unsafe{PROGRESSBAR.as_ref().unwrap().finish();}
+                        unsafe {
+                            PROGRESSBAR.as_ref().unwrap().finish();
+                        }
                     }
                     AssetClass::MacosCli => {
                         info("  > Downloading ALang Cli for Macos");
@@ -117,16 +158,16 @@ fn main() {
                             asset.url.clone(),
                             format!("{}/downloads", &data),
                             "cli_macos".to_owned(),
-                            |current, total| {
-                                unsafe {
-                                    let perc = (current * 100) / total;
+                            |current, total| unsafe {
+                                let perc = (current * 100) / total;
 
-                                    PROGRESSBAR.as_ref().unwrap().set_position(perc);
-                                }
+                                PROGRESSBAR.as_ref().unwrap().set_position(perc);
                             },
                         );
 
-                        unsafe{PROGRESSBAR.as_ref().unwrap().finish();}
+                        unsafe {
+                            PROGRESSBAR.as_ref().unwrap().finish();
+                        }
                     }
                     AssetClass::LinuxCli => {
                         info("  > Downloading ALang Cli for Linux");
@@ -141,16 +182,16 @@ fn main() {
                             asset.url.clone(),
                             format!("{}/downloads", &data),
                             "cli_linux".to_owned(),
-                            |current, total| {
-                                unsafe {
-                                    let perc = (current * 100) / total;
+                            |current, total| unsafe {
+                                let perc = (current * 100) / total;
 
-                                    PROGRESSBAR.as_ref().unwrap().set_position(perc);
-                                }
+                                PROGRESSBAR.as_ref().unwrap().set_position(perc);
                             },
                         );
 
-                        unsafe{PROGRESSBAR.as_ref().unwrap().finish();}
+                        unsafe {
+                            PROGRESSBAR.as_ref().unwrap().finish();
+                        }
                     }
                     _ => {}
                 });
@@ -176,15 +217,15 @@ fn main() {
                             asset.url.clone(),
                             format!("{}/downloads", &data),
                             "templates.zip".to_owned(),
-                            |current, total| {
-                                unsafe {
-                                    let progress = (current * 100) / total;
-                                    PROGRESSBAR.as_ref().unwrap().set_position(progress);
-                                }
+                            |current, total| unsafe {
+                                let progress = (current * 100) / total;
+                                PROGRESSBAR.as_ref().unwrap().set_position(progress);
                             },
                         );
 
-                        unsafe{PROGRESSBAR.as_ref().unwrap().finish();}
+                        unsafe {
+                            PROGRESSBAR.as_ref().unwrap().finish();
+                        }
                     }
                     AssetClass::WindowsTools => {
                         info("  > Downloading ALang Tools for Windows");
@@ -200,20 +241,20 @@ fn main() {
                             asset.url.clone(),
                             format!("{}/downloads", &data),
                             "tools_windows.zip".to_owned(),
-                            |current, total| {
-                                unsafe {
-                                    let perc = (current * 100) / total;
+                            |current, total| unsafe {
+                                let perc = (current * 100) / total;
 
-                                    PROGRESSBAR.as_ref().unwrap().set_position(perc);
-                                }
+                                PROGRESSBAR.as_ref().unwrap().set_position(perc);
                             },
                         );
 
-                        unsafe{PROGRESSBAR.as_ref().unwrap().finish();}
+                        unsafe {
+                            PROGRESSBAR.as_ref().unwrap().finish();
+                        }
                     }
                     AssetClass::MacosTools => {
                         info("  > Downloading ALang Tools for Macos");
-                        
+
                         let bar = ProgressBar::new(100);
                         bar.set_draw_target(ProgressDrawTarget::stdout());
 
@@ -225,16 +266,16 @@ fn main() {
                             asset.url.clone(),
                             format!("{}/downloads", &data),
                             "tools_macos.zip".to_owned(),
-                            |current, total| {
-                                unsafe {
-                                    let perc = (current * 100) / total;
+                            |current, total| unsafe {
+                                let perc = (current * 100) / total;
 
-                                    PROGRESSBAR.as_ref().unwrap().set_position(perc);
-                                }
+                                PROGRESSBAR.as_ref().unwrap().set_position(perc);
                             },
                         );
 
-                        unsafe{PROGRESSBAR.as_ref().unwrap().finish();}
+                        unsafe {
+                            PROGRESSBAR.as_ref().unwrap().finish();
+                        }
                     }
                     AssetClass::LinuxTools => {
                         info("  > Downloading ALang Tools for Linux");
@@ -250,16 +291,16 @@ fn main() {
                             asset.url.clone(),
                             format!("{}/downloads", &data),
                             "tools_linux.zip".to_owned(),
-                            |current, total| {
-                                unsafe {
-                                    let perc = (current * 100) / total;
+                            |current, total| unsafe {
+                                let perc = (current * 100) / total;
 
-                                    PROGRESSBAR.as_ref().unwrap().set_position(perc);
-                                }
+                                PROGRESSBAR.as_ref().unwrap().set_position(perc);
                             },
                         );
 
-                        unsafe{PROGRESSBAR.as_ref().unwrap().finish();}
+                        unsafe {
+                            PROGRESSBAR.as_ref().unwrap().finish();
+                        }
                     }
                     _ => {}
                 });
@@ -286,25 +327,32 @@ fn main() {
                 let dur = now.duration_since(UNIX_EPOCH).unwrap().as_secs();
 
                 fs::write(format!("{}/updated", &data), format!("{}", dur)).unwrap();
-            }).is_ok();
+            })
+            .is_ok();
 
             #[cfg(windows)]
             let copy = fs::copy(
-                format!("{}\\downloads\\cli_windows.exe", &data), 
-                format!("{}\\alang.exe", &data)
-            ).is_ok() && make_config;
+                format!("{}\\downloads\\cli_windows.exe", &data),
+                format!("{}\\alang.exe", &data),
+            )
+            .is_ok()
+                && make_config;
 
             #[cfg(target_os = "linux")]
             let copy = fs::copy(
-                format!("{}/downloads/cli_linux", &data), 
-                format!("{}/alang", &data)
-            ).is_ok() && make_config;
+                format!("{}/downloads/cli_linux", &data),
+                format!("{}/alang", &data),
+            )
+            .is_ok()
+                && make_config;
 
             #[cfg(target_os = "macos")]
             let copy = fs::copy(
-                format!("{}/downloads/cli_macos", &data), 
-                format!("{}/alang", &data)
-            ).is_ok() && make_config;
+                format!("{}/downloads/cli_macos", &data),
+                format!("{}/alang", &data),
+            )
+            .is_ok()
+                && make_config;
 
             if !copy {
                 err("> Failed to install alang...");
@@ -323,7 +371,8 @@ fn main() {
 
                 tools_zip.extract(extract_dest).unwrap();
                 templates_zip.extract(temp_dest).unwrap();
-            }).is_ok();
+            })
+            .is_ok();
 
             if !ok {
                 err("> Failed to install alang tools...");
@@ -365,19 +414,21 @@ fn main() {
 
                 if res.is_err() {
                     info(
-                        format!("> Could not allow exec perms for the install <\n> Run `sudo chmod {}/**/*` <", &data).as_str(),
+                        format!("> Could not allow exec perms for the install <\n> Run `sudo chmod {}` <", &data).as_str(),
                     );
                 }
             }
 
             println!("-------------------------------------------------------");
 
-            info("Press enter key to exit");
+            if args.len() == 0 || args[0].as_str() != "-f" {
+                info("Press enter key to exit");
+                
+                let mut buf = [0; 1];
+                let _ = stdin().read_exact(&mut buf);
 
-            let mut buf = [0; 1];
-            let _ = stdin().read_exact(&mut buf);
-
-            process::exit(0);
+                process::exit(0);
+            }
         } else {
             err("> Aborted, enter a new directory after running the same executable");
         }
@@ -413,16 +464,23 @@ fn info(data: &str) {
 }
 
 fn err(data: &str) {
+    red(data, true);
+}
+
+fn red(data: &str, crash: bool) {
     let mut chalk = Chalk::new();
 
     chalk.red().bold().println(&data);
 
-    info("Please delete the existing files on the install dir\nPress enter key to exit");
+    if crash {
 
-    let mut buf = [0; 1];
-    let _ = stdin().read_exact(&mut buf);
+        info("Please delete the existing files on the install dir\nPress enter key to exit");
 
-    process::exit(1);
+        let mut buf = [0; 1];
+        let _ = stdin().read_exact(&mut buf);
+
+        process::exit(1);
+    }
 }
 
 fn success(data: &str) {
