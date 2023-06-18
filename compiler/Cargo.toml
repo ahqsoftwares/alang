@@ -1,6 +1,6 @@
 [package]
 name = "compiler"
-version = "0.0.9"
+version = "0.0.10"
 edition = "2021"
 description = "Convert the alang code into ahq-asm"
 authors = ["AHQ"]
