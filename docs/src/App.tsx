@@ -3,6 +3,7 @@ import Nav from "./components/Navigation";
 
 interface Props {
     setPage: React.Dispatch<React.SetStateAction<string>>;
+    platform: "Windows" | "Macos" | "Linux" | "Unsupported"
 }
 
 const pages: { [key: string]: (props: Props) => Promise<JSX.Element> } = {
@@ -13,7 +14,7 @@ const pages: { [key: string]: (props: Props) => Promise<JSX.Element> } = {
         return (await import("./pages/Home")).default(props);
     },
     "/install": async(props: Props) => {
-        return (await import("./pages/Home")).default(props);
+        return (await import("./pages/Install")).default(props);
     },
     "/docs": async(props: Props) => {
         return (await import("./pages/Home")).default(props);
@@ -51,6 +52,20 @@ function Loading() {
 }
 
 export default function App() {
+    const platform = (() => {
+        const platform = window.navigator.userAgent.toLowerCase();
+
+        if (platform.includes('win')) {
+            return "Windows";
+        } else if (platform.includes('mac')) {
+            return "Macos";
+        } else if (platform.includes('linux') && !platform.includes('android')) {
+            return "Linux";
+        } else {
+            return "Unsupported";
+        }
+    })();
+
     const pageUrl = window.location.pathname.replace("/alang", "");
 
     if (pageUrl == "/") {
@@ -70,12 +85,13 @@ export default function App() {
         window.history.replaceState(null, "", "/alang/" + currentPage.replace("/", ""));
         (async() => {
             const element = await pageElement({
-                setPage
+                setPage,
+                platform
             });
 
             setJsx(element);
         })()
-    }, [pageElement, currentPage]);
+    }, [pageElement, currentPage, platform]);
 
     return <div className="main-container">
         <Nav
