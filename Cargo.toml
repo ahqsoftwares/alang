@@ -1,8 +1,9 @@
 [package]
 name = "alang"
-version = "0.0.8"
+version = "0.0.9"
 edition = "2021"
-description = "Alang installer"
+description = "Alang Installer & Updater"
+authors = ["AHQ"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

@@ -57,8 +57,16 @@ pub fn get_url() -> Url {
     assets.assets.iter().for_each(|asset| {
         let asset = asset.clone().to_owned();
 
-        //ignore the installers & updaters
-        if &asset.name.contains("installer") == &true {
+        #[cfg(windows)]
+        let updater = "alang_installer_windows.exe";
+
+        #[cfg(target_os = "macos")]
+        let updater = "alang_installer_macos";
+
+        #[cfg(target_os = "linux")]
+        let updater = "alang_installer_linux";
+
+        if &asset.name.starts_with(updater) == &true {
             url.set_asset(asset.browser_download_url.clone());
         }
     });

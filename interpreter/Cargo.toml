@@ -1,7 +1,9 @@
 [package]
 name = "interpreter"
-version = "0.0.8"
+version = "0.0.9"
 edition = "2021"
+description = "Interpret AHQ-Asm Code"
+authors = ["AHQ"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
